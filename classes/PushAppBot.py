@@ -37,7 +37,7 @@ class PushAppBot(TelegramBot.TelegramBot):
         state = self._getUserFromStateList(message.chatId)
         if (state['state']==None):
             if message.text == '/start':
-                self.sendMessage(message.chatId, 'Привет! Я создан для помощи с отслеживанием статистики по отжиманиям (или чем-либо подобным)\nПросто присылай мне количество твоих отжиманий в подходе\nДля статистики - /stat')
+                self.sendMessage(message.chatId, 'Привет! \U0000270C Я создан для помощи с отслеживанием статистики по отжиманиям (или чем-либо подобным)\nПросто присылай мне количество твоих отжиманий в подходе \U0000270D \nДля статистики - /stat')
             if message.text == '/stat':
                 stat = self.dbWorker.getStat(message.chatId)
                 self.sendStat(message.chatId, stat)
