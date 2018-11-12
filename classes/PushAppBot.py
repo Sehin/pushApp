@@ -15,6 +15,11 @@ class PushAppBot(TelegramBot.TelegramBot):
 
             time.sleep(self.repeatRequestTime)
 
+    def sendStat(self, chatId, stat):
+        self.sendMessage(chatId,
+                         'Статистика отжиманий (всего, в среднем за подход):\nСегодня: {}, {}\nЗа последние 7 дней: {}, {}\nЗа последние 30 дней: {}, {}\n'
+                         .format(stat['today'], int(stat['averageToday']), stat['week'], int(stat['averageWeek']),
+                                 stat['month'], int(stat['averageMonth'])))
 
     def parseMessage(self, message):
         print(message.text)
@@ -33,11 +38,13 @@ class PushAppBot(TelegramBot.TelegramBot):
         if (state['state']==None):
             if message.text == '/start':
                 self.sendMessage(message.chatId, 'Привет! Я создан для помощи с отслеживанием статистики по отжиманиям (или чем-либо подобным)\nПросто присылай мне количество твоих отжиманий в подходе\nДля статистики - /stat')
-
+            if message.text =='/stat':
+                stat = self.dbWorker.getStat(message.chatId)
+                self.sendStat(message.chatId, stat)
             if message.text.isdigit():
                 self.dbWorker.addStat(message.chatId, message.text)
-                self.dbWorker.getStat(message.chatId)
-               # self.dbWorker.getStat(message.chatId)
+                stat = self.dbWorker.getStat(message.chatId)
+                self.sendStat(message.chatId, stat)
                 pass
 
         # Часть парсинга, когда есть состояние

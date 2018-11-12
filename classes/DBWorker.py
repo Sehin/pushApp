@@ -31,21 +31,42 @@ class DBWorker:
 
     def addStat(self, chat_id, count):
         cursor = self.connection.cursor()
-        sql = "INSERT INTO `pushapp`.`pushup` (`user_id`, `date`, `count`) VALUES ((SELECT id from user where user.chat_id = {}), '{}', '{}');".format(chat_id, datetime.now(), count)
+        sql = "INSERT INTO `pushapp`.`pushup` (`user_id`, `date_rec`, `count`) VALUES ((SELECT id from user where user.chat_id = {}), '{}', '{}');".format(chat_id, datetime.now(), count)
         cursor.execute(sql)
         self.connection.commit()
 
     def getStat(self, chat_id):
+        result = {}
         cursor = self.connection.cursor()
-        todaySql = "SELECT sum(count) from pushup where user_id = (SELECT id from user where user.chat_id = {}) and date BETWEEN '{} 00:00:00' AND '{} 23:59:00'".format(chat_id, datetime.now().date(), datetime.now().date())
+        todaySql = "SELECT sum(count) from pushup where user_id = (SELECT id from user where user.chat_id = {}) and date_rec BETWEEN '{} 00:00:00' AND '{} 23:59:00'".format(chat_id, datetime.now().date(), datetime.now().date())
         cursor.execute(todaySql)
         today = cursor.fetchall()[0][0]
 
-        weekSql = "SELECT sum(count) from pushup where user_id = (SELECT id from user where user.chat_id = {}) and date BETWEEN '{} 00:00:00' AND '{} 23:59:00'".format(chat_id, datetime.now().date(), datetime.now().date())
-        cursor.execute(todaySql)
-        today = cursor.fetchall()[0][0]
+        weekSql = "SELECT sum(count) FROM pushapp.pushup where user_id = (SELECT id from user where user.chat_id = {}) and date_rec >= (curdate()-7) AND date_rec < curdate()".format(chat_id)
+        cursor.execute(weekSql)
+        week = cursor.fetchall()[0][0]
 
-        monthSql = "SELECT sum(count) from pushup where user_id = (SELECT id from user where user.chat_id = {}) and date BETWEEN '{} 00:00:00' AND '{} 23:59:00'".format(chat_id, datetime.now().date(), datetime.now().date())
-        cursor.execute(todaySql)
-        today = cursor.fetchall()[0][0]
+        monthSql = "SELECT sum(count) FROM pushapp.pushup where user_id = (SELECT id from user where user.chat_id = {}) and date_rec >= (curdate()-30) AND date_rec < curdate()".format(chat_id)
+        cursor.execute(monthSql)
+        month = cursor.fetchall()[0][0]
+
+        averageTodaySql = "SELECT sum(count)/count(*) FROM pushapp.pushup where user_id = (SELECT id from user where user.chat_id = {}) and date_rec BETWEEN '{} 00:00:00' AND '{} 23:59:00'".format(chat_id, datetime.now().date(), datetime.now().date())
+        cursor.execute(averageTodaySql)
+        averageToday = cursor.fetchall()[0][0]
+
+        averageWeekSql = "SELECT sum(count)/count(*) FROM pushapp.pushup where user_id = (SELECT id from user where user.chat_id = {}) and date_rec >= (curdate()-7) AND date_rec < curdate()".format(chat_id)
+        cursor.execute(averageWeekSql)
+        averageWeek = cursor.fetchall()[0][0]
+
+        averageMonthSql = "SELECT sum(count)/count(*) FROM pushapp.pushup where user_id = (SELECT id from user where user.chat_id = {}) and date_rec >= (curdate()-30) AND date_rec < curdate()".format(chat_id)
+        cursor.execute(averageMonthSql)
+        averageMonth = cursor.fetchall()[0][0]
+
+        result.update({'today': today})
+        result.update({'week': week})
+        result.update({'month': month})
+        result.update({'averageToday': averageToday})
+        result.update({'averageWeek': averageWeek})
+        result.update({'averageMonth': averageMonth})
+        return result
         pass
