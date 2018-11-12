@@ -18,8 +18,8 @@ class TelegramBot():
     usersState = []
     #users = DBWorker.getUsers()
 
-    def __init__(self, dataWorker, token):
-        self.dataWorker = dataWorker
+    def __init__(self, dbWorker, token):
+        self.dbWorker = dbWorker
         self.token = token
 
     def getUpdates(self):
