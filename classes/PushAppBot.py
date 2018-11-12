@@ -42,7 +42,8 @@ class PushAppBot(TelegramBot.TelegramBot):
                 stat = self.dbWorker.getStat(message.chatId)
                 self.sendStat(message.chatId, stat)
             if message.text == '/clear':
-                # todo сделать очистку БД по данному юзеру
+                self.dbWorker.deleteStats(message.chatId)
+                self.sendMessage(message.chatId, 'Статистика очищена! ' + u'\U0001F44C')
                 pass
             if message.text.isdigit():
                 self.dbWorker.addStat(message.chatId, message.text)

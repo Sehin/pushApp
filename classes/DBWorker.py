@@ -35,6 +35,12 @@ class DBWorker:
         cursor.execute(sql)
         self.connection.commit()
 
+    def deleteStats(self, chat_id):
+        cursor = self.connection.cursor()
+        sql = "DELETE FROM `pushapp`.`pushup` WHERE (`user_id` = (SELECT id from user where user.chat_id = {}))".format(chat_id)
+        cursor.execute(sql)
+        self.connection.commit()
+
     def getStat(self, chat_id):
         result = {}
         cursor = self.connection.cursor()
