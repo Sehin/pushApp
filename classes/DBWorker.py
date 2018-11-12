@@ -61,12 +61,16 @@ class DBWorker:
         averageMonthSql = "SELECT sum(count)/count(*) FROM pushapp.pushup where user_id = (SELECT id from user where user.chat_id = {}) and date_rec >= (curdate()-30) AND date_rec < curdate()".format(chat_id)
         cursor.execute(averageMonthSql)
         averageMonth = cursor.fetchall()[0][0]
-
         result.update({'today': today})
         result.update({'week': week})
         result.update({'month': month})
         result.update({'averageToday': averageToday})
         result.update({'averageWeek': averageWeek})
         result.update({'averageMonth': averageMonth})
+        for key in result:
+            if result[key] is None:
+                result[key] = 0
+
+        #todo обойти все результаты и если они None - сделать их нулями
         return result
         pass
