@@ -5,6 +5,7 @@ from . import TelegramBot
 
 class PushAppBot(TelegramBot.TelegramBot):
     def polling(self):
+        self.users = self.dbWorker.getUsers()
         while 1:
 
             for message in self.getMessages():
@@ -24,13 +25,15 @@ class PushAppBot(TelegramBot.TelegramBot):
     def parseMessage(self, message):
         print(message.text)
         # todo хранить существующих пользователей в каком-нибудь листе, чтобы не дергать каждый раз БД! (можно считывать всех юзеров единажды при запуске функции polling?)
-        # Проверка, есть ли уже пользователь в БД
-        if (not self.dbWorker.isUserInDB(message.chatId)):
-            print('User {} not in DB. Add...'.format(message.chatId))
-            self.dbWorker.addUser(message.chatId)
-            pass
-        else:
-            print('User {} is in DB.'.format(message.chatId))
+        if (message.chatId not in self.users):
+            # Проверка, есть ли уже пользователь в БД
+            if (not self.dbWorker.isUserInDB(message.chatId)):
+                print('User {} not in DB. Add...'.format(message.chatId))
+                self.dbWorker.addUser(message.chatId)
+                self.users.append(message.chatId)
+                pass
+            else:
+                print('User {} is in DB.'.format(message.chatId))
 
 
         # Проход по листу состояния пользователей

@@ -41,6 +41,16 @@ class DBWorker:
         cursor.execute(sql)
         self.connection.commit()
 
+    def getUsers(self):
+        result = []
+        cursor = self.connection.cursor()
+        sql = "SELECT chat_id FROM `pushapp`.`user`"
+        cursor.execute(sql)
+        resSql = cursor.fetchall()
+        for res in resSql:
+            result.append(res[0])
+        return result
+
     def getStat(self, chat_id):
         result = {}
         cursor = self.connection.cursor()
@@ -77,6 +87,5 @@ class DBWorker:
             if result[key] is None:
                 result[key] = 0
 
-        #todo обойти все результаты и если они None - сделать их нулями
         return result
         pass
